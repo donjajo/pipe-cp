@@ -41,7 +41,7 @@ write_to_dest(int pfd, int dfd, ssize_t sz)
 	// Pipes are blocking IO. Read operation will be blocked till any data is available
 	while ((ret = read(pfd, buf, PER_READ)) != -1) {
 		write(dfd, buf, PER_READ);
-		memset(buf, 1, PER_READ);
+		memset(buf, 0, PER_READ);
 		total += ret;
 		printf("R %ld bytes of %ld data\n", total, sz);
 		fflush(stdout);
@@ -110,7 +110,7 @@ main(int argc, char *argv[argc])
 		write(pipes[1], buf, ret);
 
 		data.written += ret;
-		memset(buf, sizeof(char), PER_READ);
+		memset(buf, 0, PER_READ);
 
 		// A callback
 		written(data);
