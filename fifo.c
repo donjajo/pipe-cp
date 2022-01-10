@@ -101,23 +101,23 @@ main(int argc, char *argv[argc])
 	if (fork() == 0) {
 		// Create a child process to watch for new writes in pipe
 		write_to_dest(pipes[0], dfd, data.total);
-	}
+	} else {
+		while ((ret = read(fd, buf, PER_READ)) != -1) {
+			if (ret == 0) {
+				break;
+			}
+			write(pipes[1], buf, ret);
 
-	while ((ret = read(fd, buf, PER_READ)) != -1) {
-		if (ret == 0) {
-			break;
+			data.written += ret;
+			memset(buf, 0, PER_READ);
+
+			// A callback
+			written(data);
 		}
-		write(pipes[1], buf, ret);
 
-		data.written += ret;
-		memset(buf, 0, PER_READ);
-
-		// A callback
-		written(data);
+		close(fd);
+		close(pipes[1]);
 	}
-
-	close(fd);
-	close(pipes[1]);
 
 	return 0;
 }
